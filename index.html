@@ -63,7 +63,7 @@
         <!-- Header -->
         <header class="mb-8 text-center">
             <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500 mb-2">
-                C I/O Master
+                FCC124 C I/O Master
             </h1>
             <p class="text-slate-400">Can you predict the behavior of printf and scanf?</p>
         </header>
@@ -199,7 +199,7 @@
             
             c.options.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = "text-left p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition active:scale-95";
+                btn.className = "option-btn text-left p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition active:scale-95";
                 btn.innerText = opt;
                 btn.onclick = () => checkAnswer(opt);
                 optionsContainer.appendChild(btn);
@@ -258,6 +258,10 @@
             const c = challenges[currentLevel];
             const isCorrect = selected === c.answer;
             const toast = document.getElementById('feedback-toast');
+            
+            // Disable all buttons immediately so they can't try again
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.disabled = true);
 
             if (isCorrect) {
                 score += 20;
@@ -274,11 +278,20 @@
                 setTimeout(() => {
                     toast.style.opacity = '0';
                     nextLevel();
-                }, 1000);
+                }, 1500);
             } else {
-                toast.innerText = "Wrong! Look closer.";
-                toast.className = "fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full font-bold shadow-2xl bg-red-500 text-white opacity-100";
-                setTimeout(() => toast.style.opacity = '0', 1000);
+                toast.innerText = "Error: Incorrect. Moving to next level...";
+                toast.className = "fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full font-bold shadow-2xl bg-red-600 text-white opacity-100";
+                
+                const term = document.getElementById('terminal-content');
+                const line = document.createElement('div');
+                line.innerHTML = `<span class="text-red-500">✖</span> [Lvl ${currentLevel+1}] Segmentation fault: Unexpected input "${selected}"`;
+                term.appendChild(line);
+
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    nextLevel();
+                }, 2000);
             }
         }
 
@@ -292,13 +305,13 @@
         }
 
         function showFinalResults() {
-            document.getElementById('question-text').innerText = "Module Mastered!";
+            document.getElementById('question-text').innerText = "Session Concluded";
             const optionsContainer = document.getElementById('options-grid');
             optionsContainer.innerHTML = `
                 <div class="text-center p-8 bg-sky-900/20 rounded-xl border border-sky-500/30">
                     <p class="text-3xl font-bold mb-2">Final Score: ${score}</p>
-                    <p class="text-slate-400 mb-6">You've mastered C Input and Output!</p>
-                    <button onclick="location.reload()" class="bg-sky-500 hover:bg-sky-400 px-6 py-2 rounded-lg font-bold transition">Restart Game</button>
+                    <p class="text-slate-400 mb-6">Review your terminal logs for performance analysis.</p>
+                    <button onclick="location.reload()" class="bg-sky-500 hover:bg-sky-400 px-6 py-2 rounded-lg font-bold transition">Restart Session</button>
                 </div>
             `;
             document.getElementById('ai-explain-btn').classList.add('hidden');
@@ -307,5 +320,4 @@
         window.onload = loadChallenge;
     </script>
 </body>
-
 </html>
